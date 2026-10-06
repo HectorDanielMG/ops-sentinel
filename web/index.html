@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d18">
+  <title>Ops Sentinel · Confiabilidad de servicios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">◈</span><span>ops<span class="brand-light">sentinel</span></span></div>
+      <div class="workspace"><span class="workspace-dot"></span><div><small>ESPACIO DE TRABAJO</small><strong>Laboratorio personal</strong></div><span class="chevron">⌄</span></div>
+      <nav><small class="nav-label">OBSERVABILIDAD</small><a class="nav-item active" href="#overview"><span>▦</span>Resumen</a><a class="nav-item" href="#services"><span>◉</span>Servicios <b id="nav-count">0</b></a><a class="nav-item" href="#incidents"><span>⌁</span>Incidentes <b id="nav-incidents">0</b></a></nav>
+      <div class="sidebar-bottom"><div class="live-indicator"><i></i>MONITOREO ACTIVO</div><div class="user-card"><div class="avatar">HM</div><div><strong>Hector M.</strong><small>Administrador</small></div><span class="dots">···</span></div></div>
+    </aside>
+    <main>
+      <header><div class="breadcrumb">Espacio de trabajo <span>/</span> <strong>Resumen</strong></div><div class="header-actions"><span class="updated"><i></i><span id="updated">Conectando…</span></span><button class="icon-button" id="refresh" title="Ejecutar comprobaciones ahora" aria-label="Ejecutar comprobaciones ahora">↻</button><button class="add-button" id="open-modal"><span>＋</span> Agregar servicio</button></div></header>
+      <section class="intro" id="overview"><div><div class="eyebrow"><span class="eyebrow-line"></span>CENTRO DE CONFIABILIDAD</div><h1>Resumen de servicios</h1><p>Supervisa el estado, la latencia y los objetivos de nivel de servicio.</p></div><div class="date-pill"><span>◷</span> Últimas 24 horas <span class="down-caret">⌄</span></div></section>
+      <section class="stats" aria-label="Fleet summary">
+        <article class="stat-card"><div class="stat-top"><span>DISPONIBILIDAD GENERAL</span><span class="stat-icon green">◉</span></div><div class="stat-value" id="fleet-uptime">—<small>%</small></div><div class="stat-foot"><span class="green-text">●</span> Promedio de los servicios monitoreados</div></article>
+        <article class="stat-card"><div class="stat-top"><span>SERVICIOS MONITOREADOS</span><span class="stat-icon blue">▦</span></div><div class="stat-value" id="service-total">—</div><div class="stat-foot"><span class="blue-text">↗</span> Endpoints HTTP del espacio de trabajo</div></article>
+        <article class="stat-card"><div class="stat-top"><span>INCIDENTES ACTIVOS</span><span class="stat-icon" id="incident-icon">⌁</span></div><div class="stat-value" id="incident-total">—</div><div class="stat-foot" id="incident-caption">Todos los sistemas funcionan</div></article>
+        <article class="stat-card"><div class="stat-top"><span>INTERVALO DE COMPROBACIÓN</span><span class="stat-icon purple">◷</span></div><div class="stat-value">30<small>s</small></div><div class="stat-foot"><span class="muted-dot">●</span> Verificación automática del estado</div></article>
+      </section>
+      <section class="content-grid">
+        <div class="panel services-panel" id="services"><div class="panel-heading"><div><h2>Servicios</h2><p>Estado y cumplimiento del SLO por endpoint</p></div><button class="text-button" id="view-incidents">Ver incidentes <span>→</span></button></div>
+          <div class="table-head"><span>SERVICIO</span><span>ESTADO</span><span>DISPONIBILIDAD <i>ⓘ</i></span><span>LATENCIA</span><span>SLO</span></div><div id="service-list" class="service-list"></div>
+        </div>
+        <div class="panel incident-panel" id="incidents"><div class="panel-heading"><div><h2>Incidentes recientes</h2><p>Eventos del servicio y recuperación</p></div><span class="live-tag"><i></i> EN VIVO</span></div><div id="incident-list" class="incident-list"></div><div class="incident-footer"><span>Eventos más recientes</span><span>↗</span></div></div>
+      </section>
+      <footer><span><b>◈</b> OPS SENTINEL <span class="footer-sep">/</span> MONITOR DE CONFIABILIDAD</span><span>Métricas Prometheus <a href="/metrics">/metrics</a><span class="footer-sep">·</span> Documentación de API <a href="/docs">/docs</a></span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <dialog id="service-modal"><form id="service-form"><button type="button" class="close-modal" id="close-modal" aria-label="Cerrar">×</button><div class="eyebrow"><span class="eyebrow-line"></span>NUEVO ENDPOINT</div><h2>Monitorear un servicio</h2><p class="modal-copy">Agrega un endpoint HTTP de estado accesible desde el monitor.</p><label>Nombre del servicio<input name="name" placeholder="p. ej., API de pagos" minlength="2" maxlength="80" required></label><label>URL de comprobación<input name="url" type="url" placeholder="https://api.ejemplo.com/health" required></label><label>Objetivo de disponibilidad SLO (%)<input name="slo_target" type="number" min="1" max="100" step="0.1" value="99.9" required></label><div class="form-error" id="form-error"></div><button class="add-button submit-button" type="submit">Agregar al monitoreo <span>→</span></button></form></dialog>
+  <script src="/assets/app.js"></script>
+</body>
+</html>
