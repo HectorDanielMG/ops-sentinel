@@ -11,6 +11,7 @@ Ops Sentinel es un proyecto de portafolio centrado en la operación de software 
 - Abre un incidente cuando falla un servicio y lo resuelve cuando se recupera.
 - Distingue los servicios caídos de los que dejaron de reportar comprobaciones recientes.
 - Muestra disponibilidad de las últimas 24 horas, latencia y cumplimiento del SLO por servicio.
+- Presenta la última latencia y el percentil 95 de las comprobaciones recientes para detectar respuestas lentas sostenidas.
 - Calcula el presupuesto de error SLO restante por servicio y lo expone para paneles de Prometheus.
 - Publica métricas compatibles con Prometheus en `/metrics`.
 - Incluye endpoints de demostración estables e intermitentes.
@@ -50,7 +51,7 @@ El endpoint debe ser accesible desde el proceso de Ops Sentinel. Puedes cambiar 
 | Método | Endpoint | Función |
 | --- | --- | --- |
 | `GET` | `/api/summary` | Disponibilidad general, incidentes activos e intervalo efectivo de comprobación |
-| `GET` | `/api/services` | Servicios, estado actual, disponibilidad, SLO y presupuesto de error restante de las últimas 24 horas |
+| `GET` | `/api/services` | Servicios, estado actual, disponibilidad, latencia P95, SLO y presupuesto de error restante de las últimas 24 horas |
 | `POST` | `/api/services` | Registrar un endpoint para monitoreo |
 | `GET` | `/api/incidents` | Consultar incidentes recientes |
 | `POST` | `/api/checks/run` | Ejecutar una comprobación de inmediato |

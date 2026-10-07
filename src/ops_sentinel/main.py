@@ -111,7 +111,8 @@ def service_payload(db: sqlite3.Connection, service: sqlite3.Row) -> dict[str, A
     else:
         status = "stale" if is_stale else "up"
     latencies = sorted(r["latency_ms"] for r in rows)
-    p95 = latencies[min(len(latencies) - 1, int(len(latencies) * 0.95))] if latencies else None
+    p95_index = max(0, (95 * len(latencies) + 99) // 100 - 1)
+    p95 = latencies[p95_index] if latencies else None
     return {
         "id": service["id"], "name": service["name"], "url": service["url"],
         "slo_target": service["slo_target"], "status": status,
