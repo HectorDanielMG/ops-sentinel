@@ -84,17 +84,40 @@ def service_payload(db: sqlite3.Connection, service: sqlite3.Row) -> dict[str, A
     ).fetchall()
     total = len(rows)
     uptime = (sum(r["ok"] for r in rows) / total * 100) if total else None
+    allowed_error = 100 - service["slo_target"]
+    if uptime is None:
+        error_budget_remaining = None
+    elif allowed_error == 0:
+        error_budget_remaining = 100.0 if uptime == 100 else 0.0
+    else:
+        consumed = (100 - uptime) / allowed_error * 100
+        error_budget_remaining = round(max(0, min(100, 100 - consumed)), 1)
     active = db.execute(
         "SELECT id,opened_at,message FROM incidents WHERE service_id=? AND resolved_at IS NULL",
         (service["id"],),
     ).fetchone()
-    last = rows[0] if rows else None
+    last = db.execute(
+        "SELECT checked_at, status_code, latency_ms, error FROM checks "
+        "WHERE service_id=? ORDER BY checked_at DESC LIMIT 1",
+        (service["id"],),
+    ).fetchone()
+    last_checked = datetime.fromisoformat(last["checked_at"].replace("Z", "+00:00")) if last else None
+    stale_after = CHECK_INTERVAL * 3
+    is_stale = bool(last_checked and (datetime.now(timezone.utc) - last_checked).total_seconds() > stale_after)
+    if active:
+        status = "down"
+    elif not last:
+        status = "unknown"
+    else:
+        status = "stale" if is_stale else "up"
     latencies = sorted(r["latency_ms"] for r in rows)
     p95 = latencies[min(len(latencies) - 1, int(len(latencies) * 0.95))] if latencies else None
     return {
         "id": service["id"], "name": service["name"], "url": service["url"],
-        "slo_target": service["slo_target"], "status": "down" if active else ("unknown" if not last else "up"),
+        "slo_target": service["slo_target"], "status": status,
+        "check_stale_after_seconds": stale_after,
         "uptime_24h": round(uptime, 3) if uptime is not None else None,
+        "error_budget_remaining_percent": error_budget_remaining,
         "checks_24h": total, "latency_ms": round(last["latency_ms"], 1) if last else None,
         "p95_latency_ms": round(p95, 1) if p95 is not None else None,
         "last_checked_at": last["checked_at"] if last else None,
@@ -257,4 +280,12 @@ def metrics() -> str:
         label = service["name"].replace('"', '\\"')
         ratio = (service["uptime_24h"] or 0) / 100
         lines.append(f'ops_sentinel_uptime_ratio_24h{{service="{label}"}} {ratio:.6f}')
+    lines += ["# HELP ops_sentinel_error_budget_remaining_ratio_24h Proporción del presupuesto de error SLO restante en las últimas 24 horas.",
+              "# TYPE ops_sentinel_error_budget_remaining_ratio_24h gauge"]
+    for service in services:
+        if service["error_budget_remaining_percent"] is None:
+            continue
+        label = service["name"].replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ")
+        ratio = service["error_budget_remaining_percent"] / 100
+        lines.append(f'ops_sentinel_error_budget_remaining_ratio_24h{{service="{label}"}} {ratio:.6f}')
     return "\n".join(lines) + "\n"

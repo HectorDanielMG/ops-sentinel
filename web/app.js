@@ -12,13 +12,14 @@ function toast(message) { const el = $("toast"); el.textContent = message; el.cl
 function renderServices(services) {
   $("nav-count").textContent = services.length;
   $("service-list").innerHTML = services.length ? services.map((s, i) => {
-    const healthy = s.status === "up", down = s.status === "down";
-    const state = healthy ? "up" : down ? "down" : "unknown";
+    const healthy = s.status === "up", down = s.status === "down", stale = s.status === "stale";
+    const state = healthy ? "up" : down ? "down" : stale ? "stale" : "unknown";
     const uptime = s.uptime_24h == null ? "—" : `${fmt(s.uptime_24h, 2)}%`;
     const progress = s.uptime_24h == null ? 0 : Math.min(100, s.uptime_24h / s.slo_target * 100);
     const warning = s.uptime_24h != null && s.uptime_24h < s.slo_target;
-    const stateLabel = healthy ? "ACTIVO" : down ? "CAÍDO" : "SIN DATOS";
-    return `<div class="service-row"><div class="service-name"><span class="service-symbol">${i % 2 ? "⌘" : "◈"}</span><div class="service-copy"><strong>${esc(s.name)}</strong><small>${esc(new URL(s.url).host)}</small></div></div><span class="status ${state}"><i></i>${stateLabel}</span><div class="availability">${uptime}<small>${s.checks_24h} comprob.</small></div><div class="latency">${s.latency_ms == null ? "—" : fmt(s.latency_ms, 0)} <small>ms</small></div><div class="slo-wrap"><span class="slo-track"><span class="slo-fill ${warning ? "warn" : ""}" style="display:block;width:${progress}%"></span></span><span class="slo-value">${fmt(s.slo_target, 1)}%</span></div></div>`;
+    const budget = s.error_budget_remaining_percent;
+    const stateLabel = healthy ? "ACTIVO" : down ? "CAÍDO" : stale ? "RETRASADO" : "SIN DATOS";
+    return `<div class="service-row"><div class="service-name"><span class="service-symbol">${i % 2 ? "⌘" : "◈"}</span><div class="service-copy"><strong>${esc(s.name)}</strong><small>${esc(new URL(s.url).host)}</small></div></div><span class="status ${state}"><i></i>${stateLabel}</span><div class="availability">${uptime}<small>${s.checks_24h} comprob.</small></div><div class="latency">${s.latency_ms == null ? "—" : fmt(s.latency_ms, 0)} <small>ms</small></div><div class="slo-wrap" title="Presupuesto de error restante en 24 horas"><span class="slo-track"><span class="slo-fill ${warning ? "warn" : ""}" style="display:block;width:${progress}%"></span></span><span class="slo-value">${fmt(s.slo_target, 1)}%</span>${budget == null ? "" : `<small class="budget-value">${fmt(budget, 0)}% restante</small>`}</div></div>`;
   }).join("") : `<div class="empty-state"><span>◈</span>Aún no hay servicios. Agrega un endpoint para iniciar el monitoreo.</div>`;
 }
 
