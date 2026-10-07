@@ -229,6 +229,7 @@ def summary() -> dict[str, Any]:
     measured = [s["uptime_24h"] for s in services if s["uptime_24h"] is not None]
     return {"service_count": len(services), "active_incidents": active,
             "fleet_uptime_24h": round(sum(measured) / len(measured), 3) if measured else None,
+            "check_interval_seconds": CHECK_INTERVAL,
             "checked_at": now_iso()}
 
 

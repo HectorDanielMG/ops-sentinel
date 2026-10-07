@@ -43,13 +43,13 @@ curl -X POST http://localhost:8000/api/services \
   -d '{"name":"API de pagos","url":"https://ejemplo.com/health","slo_target":99.9}'
 ```
 
-El endpoint debe ser accesible desde el proceso de Ops Sentinel. Puedes cambiar el intervalo de comprobación con `CHECK_INTERVAL_SECONDS` (30 segundos por defecto), el tiempo máximo de espera con `REQUEST_TIMEOUT_SECONDS` (5 segundos por defecto) y la ubicación de SQLite con `DATABASE_PATH`.
+El endpoint debe ser accesible desde el proceso de Ops Sentinel. Puedes cambiar el intervalo de comprobación con `CHECK_INTERVAL_SECONDS` (30 segundos por defecto); el panel muestra el valor efectivo. También puedes configurar el tiempo máximo de espera con `REQUEST_TIMEOUT_SECONDS` (5 segundos por defecto) y la ubicación de SQLite con `DATABASE_PATH`.
 
 ## API
 
 | Método | Endpoint | Función |
 | --- | --- | --- |
-| `GET` | `/api/summary` | Disponibilidad general e incidentes activos |
+| `GET` | `/api/summary` | Disponibilidad general, incidentes activos e intervalo efectivo de comprobación |
 | `GET` | `/api/services` | Servicios, estado actual, disponibilidad, SLO y presupuesto de error restante de las últimas 24 horas |
 | `POST` | `/api/services` | Registrar un endpoint para monitoreo |
 | `GET` | `/api/incidents` | Consultar incidentes recientes |

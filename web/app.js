@@ -42,6 +42,7 @@ async function refresh() {
     $("fleet-uptime").innerHTML = `${fmt(summary.fleet_uptime_24h, 2)}<small>%</small>`;
     $("service-total").textContent = summary.service_count;
     $("incident-total").textContent = summary.active_incidents;
+    $("check-interval").textContent = summary.check_interval_seconds;
     renderServices(services); renderIncidents(incidents);
     $("updated").textContent = `Actualizado ${new Date().toLocaleTimeString("es-MX", {hour:"2-digit",minute:"2-digit",second:"2-digit"})}`;
   } catch { $("updated").textContent = "Error de conexión"; }
