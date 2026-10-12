@@ -27,6 +27,11 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def prometheus_label(value: str) -> str:
+    """Escapa los caracteres especiales de una etiqueta de texto Prometheus."""
+    return value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+
+
 def connect() -> sqlite3.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(DB_PATH, timeout=10)
@@ -274,12 +279,12 @@ def metrics() -> str:
     lines = ["# HELP ops_sentinel_service_up Indica si la última comprobación tuvo éxito.",
              "# TYPE ops_sentinel_service_up gauge"]
     for service in services:
-        label = service["name"].replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ")
+        label = prometheus_label(service["name"])
         lines.append(f'ops_sentinel_service_up{{service="{label}"}} {1 if service["status"] == "up" else 0}')
     lines += ["# HELP ops_sentinel_uptime_ratio_24h Proporción de disponibilidad según las comprobaciones de las últimas 24 horas.",
               "# TYPE ops_sentinel_uptime_ratio_24h gauge"]
     for service in services:
-        label = service["name"].replace('"', '\\"')
+        label = prometheus_label(service["name"])
         ratio = (service["uptime_24h"] or 0) / 100
         lines.append(f'ops_sentinel_uptime_ratio_24h{{service="{label}"}} {ratio:.6f}')
     lines += ["# HELP ops_sentinel_error_budget_remaining_ratio_24h Proporción del presupuesto de error SLO restante en las últimas 24 horas.",
@@ -287,7 +292,7 @@ def metrics() -> str:
     for service in services:
         if service["error_budget_remaining_percent"] is None:
             continue
-        label = service["name"].replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ")
+        label = prometheus_label(service["name"])
         ratio = service["error_budget_remaining_percent"] / 100
         lines.append(f'ops_sentinel_error_budget_remaining_ratio_24h{{service="{label}"}} {ratio:.6f}')
     return "\n".join(lines) + "\n"
