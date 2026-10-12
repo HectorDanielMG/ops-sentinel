@@ -9,7 +9,7 @@ Ops Sentinel es un proyecto de portafolio centrado en la operación de software 
 - Comprueba endpoints HTTP registrados en un intervalo configurable.
 - Guarda el tiempo de respuesta y el código HTTP en SQLite.
 - Abre un incidente cuando falla un servicio y lo resuelve cuando se recupera.
-- Distingue los servicios caídos de los que dejaron de reportar comprobaciones recientes.
+- Distingue los servicios caídos de los que dejaron de reportar comprobaciones recientes e indica hace cuánto se ejecutó la última verificación.
 - Muestra disponibilidad de las últimas 24 horas, latencia y cumplimiento del SLO por servicio.
 - Presenta la última latencia y el percentil 95 de las comprobaciones recientes para detectar respuestas lentas sostenidas.
 - Calcula el presupuesto de error SLO restante por servicio y lo expone para paneles de Prometheus.

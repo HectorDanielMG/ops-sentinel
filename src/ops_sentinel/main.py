@@ -107,8 +107,12 @@ def service_payload(db: sqlite3.Connection, service: sqlite3.Row) -> dict[str, A
         (service["id"],),
     ).fetchone()
     last_checked = datetime.fromisoformat(last["checked_at"].replace("Z", "+00:00")) if last else None
+    last_check_age_seconds = (
+        max(0, round((datetime.now(timezone.utc) - last_checked).total_seconds()))
+        if last_checked else None
+    )
     stale_after = CHECK_INTERVAL * 3
-    is_stale = bool(last_checked and (datetime.now(timezone.utc) - last_checked).total_seconds() > stale_after)
+    is_stale = bool(last_check_age_seconds is not None and last_check_age_seconds > stale_after)
     if active:
         status = "down"
     elif not last:
@@ -127,6 +131,7 @@ def service_payload(db: sqlite3.Connection, service: sqlite3.Row) -> dict[str, A
         "checks_24h": total, "latency_ms": round(last["latency_ms"], 1) if last else None,
         "p95_latency_ms": round(p95, 1) if p95 is not None else None,
         "last_checked_at": last["checked_at"] if last else None,
+        "last_check_age_seconds": last_check_age_seconds,
         "last_status_code": last["status_code"] if last else None,
         "last_error": last["error"] if last else None,
         "active_incident": dict(active) if active else None,

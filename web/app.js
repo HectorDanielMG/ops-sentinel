@@ -5,6 +5,10 @@ const ago = (stamp) => {
   const seconds = Math.max(0, Math.floor((Date.now() - new Date(stamp).getTime()) / 1000));
   return seconds < 60 ? `hace ${seconds} s` : `hace ${Math.floor(seconds / 60)} min`;
 };
+const checkAge = (seconds) => {
+  if (seconds == null) return "sin datos";
+  return seconds < 60 ? `hace ${seconds} s` : `hace ${Math.floor(seconds / 60)} min`;
+};
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let toastTimer;
 function toast(message) { const el = $("toast"); el.textContent = message; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2600); }
@@ -19,7 +23,7 @@ function renderServices(services) {
     const warning = s.uptime_24h != null && s.uptime_24h < s.slo_target;
     const budget = s.error_budget_remaining_percent;
     const stateLabel = healthy ? "ACTIVO" : down ? "CAÍDO" : stale ? "RETRASADO" : "SIN DATOS";
-    return `<div class="service-row"><div class="service-name"><span class="service-symbol">${i % 2 ? "⌘" : "◈"}</span><div class="service-copy"><strong>${esc(s.name)}</strong><small>${esc(new URL(s.url).host)}</small></div></div><span class="status ${state}"><i></i>${stateLabel}</span><div class="availability">${uptime}<small>${s.checks_24h} comprob.</small></div><div class="latency">${s.latency_ms == null ? "—" : fmt(s.latency_ms, 0)} <small>ms</small><small class="latency-p95">P95 ${s.p95_latency_ms == null ? "—" : fmt(s.p95_latency_ms, 0)} ms</small></div><div class="slo-wrap" title="Presupuesto de error restante en 24 horas"><span class="slo-track"><span class="slo-fill ${warning ? "warn" : ""}" style="display:block;width:${progress}%"></span></span><span class="slo-value">${fmt(s.slo_target, 1)}%</span>${budget == null ? "" : `<small class="budget-value">${fmt(budget, 0)}% restante</small>`}</div></div>`;
+    return `<div class="service-row"><div class="service-name"><span class="service-symbol">${i % 2 ? "⌘" : "◈"}</span><div class="service-copy"><strong>${esc(s.name)}</strong><small>${esc(new URL(s.url).host)}</small></div></div><span class="status ${state}"><i></i>${stateLabel}</span><div class="availability">${uptime}<small>${s.checks_24h} comprob. · ${checkAge(s.last_check_age_seconds)}</small></div><div class="latency">${s.latency_ms == null ? "—" : fmt(s.latency_ms, 0)} <small>ms</small><small class="latency-p95">P95 ${s.p95_latency_ms == null ? "—" : fmt(s.p95_latency_ms, 0)} ms</small></div><div class="slo-wrap" title="Presupuesto de error restante en 24 horas"><span class="slo-track"><span class="slo-fill ${warning ? "warn" : ""}" style="display:block;width:${progress}%"></span></span><span class="slo-value">${fmt(s.slo_target, 1)}%</span>${budget == null ? "" : `<small class="budget-value">${fmt(budget, 0)}% restante</small>`}</div></div>`;
   }).join("") : `<div class="empty-state"><span>◈</span>Aún no hay servicios. Agrega un endpoint para iniciar el monitoreo.</div>`;
 }
 
