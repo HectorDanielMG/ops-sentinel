@@ -50,7 +50,7 @@ El endpoint debe ser accesible desde el proceso de Ops Sentinel. Puedes cambiar 
 
 | Método | Endpoint | Función |
 | --- | --- | --- |
-| `GET` | `/api/summary` | Disponibilidad general, incidentes activos e intervalo efectivo de comprobación |
+| `GET` | `/api/summary` | Disponibilidad general, incidentes activos, servicios retrasados e intervalo efectivo de comprobación |
 | `GET` | `/api/services` | Servicios, estado actual, disponibilidad, latencia P95, SLO y presupuesto de error restante de las últimas 24 horas |
 | `POST` | `/api/services` | Registrar un endpoint para monitoreo |
 | `GET` | `/api/incidents` | Consultar incidentes recientes |

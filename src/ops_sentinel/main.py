@@ -243,8 +243,9 @@ def summary() -> dict[str, Any]:
     with connect() as db:
         services = [service_payload(db, row) for row in db.execute("SELECT * FROM services ORDER BY created_at")]
     active = sum(s["status"] == "down" for s in services)
+    stale = sum(s["status"] == "stale" for s in services)
     measured = [s["uptime_24h"] for s in services if s["uptime_24h"] is not None]
-    return {"service_count": len(services), "active_incidents": active,
+    return {"service_count": len(services), "active_incidents": active, "stale_services": stale,
             "fleet_uptime_24h": round(sum(measured) / len(measured), 3) if measured else None,
             "check_interval_seconds": CHECK_INTERVAL,
             "checked_at": now_iso()}
