@@ -21,6 +21,7 @@ WEB_DIR = ROOT / "web"
 DB_PATH = Path(os.getenv("DATABASE_PATH", str(ROOT / "ops-sentinel.db")))
 CHECK_INTERVAL = max(5, int(os.getenv("CHECK_INTERVAL_SECONDS", "30")))
 REQUEST_TIMEOUT = max(1, float(os.getenv("REQUEST_TIMEOUT_SECONDS", "5")))
+STARTED_AT = datetime.now(timezone.utc)
 
 
 def now_iso() -> str:
@@ -220,8 +221,8 @@ def dashboard() -> FileResponse:
 
 
 @app.get("/healthz")
-def healthz() -> dict[str, str]:
-    return {"status": "ok", "time": now_iso()}
+def healthz() -> dict[str, Any]:
+    return {"status": "ok", "time": now_iso(), "uptime_seconds": round((datetime.now(timezone.utc) - STARTED_AT).total_seconds())}
 
 
 @app.get("/demo/healthy")
