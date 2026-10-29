@@ -14,7 +14,7 @@ import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, field_validator
 
 ROOT = Path(__file__).resolve().parents[2]
 WEB_DIR = ROOT / "web"
@@ -207,6 +207,11 @@ class ServiceInput(BaseModel):
     name: str = Field(min_length=2, max_length=80, description="Nombre que aparecerá en el panel")
     url: HttpUrl
     slo_target: float = Field(default=99.9, gt=0, le=100, description="Objetivo de disponibilidad, como porcentaje")
+
+    @field_validator("name")
+    @classmethod
+    def normalize_name(cls, value: str) -> str:
+        return value.strip()
 
 
 @app.get("/")
