@@ -13,7 +13,7 @@ Ops Sentinel es un proyecto de portafolio centrado en la operación de software 
 - Muestra disponibilidad de las últimas 24 horas, latencia y cumplimiento del SLO por servicio.
 - Presenta la última latencia y el percentil 95 de las comprobaciones recientes para detectar respuestas lentas sostenidas.
 - Calcula el presupuesto de error SLO restante por servicio y lo expone para paneles de Prometheus.
-- Publica métricas compatibles con Prometheus en `/metrics`.
+- Publica métricas compatibles con Prometheus en `/metrics`, incluido el estado de comprobaciones retrasadas.
 - Incluye endpoints de demostración estables e intermitentes.
 - Se despliega con Docker y conserva la base de datos en un volumen persistente.
 

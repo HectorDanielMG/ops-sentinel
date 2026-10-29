@@ -293,6 +293,11 @@ def metrics() -> str:
     for service in services:
         label = prometheus_label(service["name"])
         lines.append(f'ops_sentinel_service_up{{service="{label}"}} {1 if service["status"] == "up" else 0}')
+    lines += ["# HELP ops_sentinel_service_stale Indica si la última comprobación superó el periodo esperado.",
+              "# TYPE ops_sentinel_service_stale gauge"]
+    for service in services:
+        label = prometheus_label(service["name"])
+        lines.append(f'ops_sentinel_service_stale{{service="{label}"}} {1 if service["status"] == "stale" else 0}')
     lines += ["# HELP ops_sentinel_uptime_ratio_24h Proporción de disponibilidad según las comprobaciones de las últimas 24 horas.",
               "# TYPE ops_sentinel_uptime_ratio_24h gauge"]
     for service in services:
